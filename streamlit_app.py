@@ -22,7 +22,7 @@ def get_fruit_load_list(connection) -> pd.DataFrame:
         
 def insert_row_snowflake(connection, new_fruit: str) -> str:
     with connection.cursor() as my_cur:
-        my_cur.execute("insert into fruit_load_list values (new_fruit)")
+        my_cur.execute(f"insert into fruit_load_list values ('{new_fruit}')")
         return f'Thanks for adding {new_fruit}'
         
 # Create website
