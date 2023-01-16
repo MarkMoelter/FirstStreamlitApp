@@ -12,11 +12,19 @@ def get_fruityvice_data(fruit_choice):
     return fruityvice_normalized
     
 # Snowflake functions
+def snowflake_connection():
+    return snowflake.connector.connect(**streamlit.secrets["snowflake"])
+
 def get_fruit_load_list(connection) -> pd.DataFrame:
     with connection.cursor() as my_cur:
         my_cur.execute('Select * from fruit_load_list')
         return my_cur.fetchall()
-
+        
+def insert_row_snowflake(connection, new_fruit: str) -> str:
+    with connection.cursor() as my_cur:
+        my_cur.execute("insert into fruit_load_list values ('from streamlit')")
+        return f'Thanks for adding {new_fruit}'
+        
 # Create website
 # New Section
 streamlit.title('My Parent\'s New Healthy Diner')
@@ -55,14 +63,16 @@ try:
 except URLError as e:
     streamlit.error()
 
-# streamlit.stop()
-
 # Snowflake Connection
+# Fruit Load List and button
 streamlit.header("The fruit load list contains:")
+
 if streamlit.button('Get Fruit Load List'):
-    my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
-    my_data_rows = get_fruit_load_list(my_cnx)
+    my_data_rows = get_fruit_load_list(snowflake_connection())
     streamlit.dataframe(my_data_rows)
 
-add_my_fruit = streamlit.text_input('What fruit would you like to add?', 'jackfruit')
-streamlit.write('Thanks for adding ', add_my_fruit)
+# Add fruit to list
+add_my_fruit = streamlit.text_input('What fruit would you like to add?')
+if streamlit.button('Add a Fruit to the List'):
+    thank_you_string = insert_row_snowflake(add_my_fruit)
+    streamlit.write(thank_you_string)
