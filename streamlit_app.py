@@ -74,5 +74,6 @@ if streamlit.button('Get Fruit Load List'):
 # Add fruit to list
 add_my_fruit = streamlit.text_input('What fruit would you like to add?')
 if streamlit.button('Add a Fruit to the List'):
-    thank_you_string = insert_row_snowflake(add_my_fruit)
+    my_cnx = snowflake_connection()
+    thank_you_string = insert_row_snowflake(my_cnx, add_my_fruit)
     streamlit.write(thank_you_string)
